@@ -1,7 +1,27 @@
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+import Swal from 'sweetalert2';
 
 const Navbar = () => {
+    const {user, logout} = useAuth()
+    const navigate = useNavigate()
+    
+    const handleLogout = () => {
+        logout()
+            .then(() => {
+                navigate('/')
+            })
+            .catch(error => {
+                console.error(error)
+                Swal.fire({
+                    icon: 'error',
+                    title: `${error.code}`,
+                    text: `${error.message}`
+                })
+            })
+    }
+
     const navItems = <>
             <li><NavLink to='/'>Blogs</NavLink></li>
             <li><NavLink to='/myblogs'>My Blogs</NavLink></li>
@@ -26,7 +46,7 @@ const Navbar = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-                <Link to='/login' className="btn">Login</Link>
+                {user ? <button onClick={handleLogout} className="btn">Logout</button> : <Link to='/login' className="btn">Login</Link>}
             </div>
         </div>
     );
