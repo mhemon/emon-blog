@@ -2,11 +2,13 @@ import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import Swal from 'sweetalert2';
+import useAuthor from '../../hooks/useAuthor';
 
 const Navbar = () => {
-    const {user, logout} = useAuth()
+    const { user, logout } = useAuth()
+    const [isAuthor] = useAuthor()
     const navigate = useNavigate()
-    
+
     const handleLogout = () => {
         logout()
             .then(() => {
@@ -23,9 +25,9 @@ const Navbar = () => {
     }
 
     const navItems = <>
-            <li><NavLink to='/'>Blogs</NavLink></li>
-            <li><NavLink to='/myblogs'>My Blogs</NavLink></li>
-            <li><NavLink to='/newblog'>Add New Blog</NavLink></li>
+        <li><NavLink to='/'>Blogs</NavLink></li>
+        {isAuthor && <li><NavLink to='/myblogs'>My Blogs</NavLink></li>}
+        {isAuthor && <li><NavLink to='/newblog'>Add New Blog</NavLink></li>}
     </>
     return (
         <div className="navbar bg-base-100">
