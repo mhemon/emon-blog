@@ -17,8 +17,8 @@ const SocialLogin = () => {
       title: 'Select User Type',
       input: 'select',
       inputOptions: {
-        User: 'user',
-        Author: 'author',
+        user: 'User',
+        author: 'Author',
       },
       inputPlaceholder: 'Select user type',
       showCancelButton: true,

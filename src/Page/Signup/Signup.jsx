@@ -41,7 +41,7 @@ const Signup = () => {
                         const updateUser = {
                             name: data.name,
                             email: data.email,
-                            image: data.photoURL,
+                            image: photoURL,
                             role: selectedOption
                         }
                         fetch('http://localhost:5000/users', {
