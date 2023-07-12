@@ -9,11 +9,9 @@ const MyBlog = () => {
     const [axiosSecure] = useAxiosSecure()
     const { user } = useAuth()
 
-    const [blogTitle, setBlogTitle] = useState('');
     const [blogDescription, setBlogDescription] = useState('');
-    const [updateMode, setUpdateMode] = useState(false);
-    const [updateId, setUpdateId] = useState('');
-    
+    const [showFullText, setShowFullText] = useState(false);
+
     // we are using TanStack Query so that we don't have to refetch all the time when we delete or update a blog.
     const { data: myBlogs = [], isLoading, refetch } = useQuery({
         queryKey: ['my-blogs'],
@@ -50,7 +48,7 @@ const MyBlog = () => {
         }).then(result => {
             if (result.isConfirmed) {
                 const { title, description } = result.value;
-                const updateBlog = {blogTitle: title, blogDetails: description }
+                const updateBlog = { blogTitle: title, blogDetails: description }
                 axiosSecure.patch(`/myblogs/${singleBlog._id}`, updateBlog)
                     .then(res => {
                         console.log('res from update', res.data);
@@ -92,23 +90,43 @@ const MyBlog = () => {
         })
     }
 
+    const toggleFullText = () => {
+        setShowFullText(!showFullText);
+    };
+
+    const renderBlogDetails = (blogDetails) => {
+        if (showFullText || blogDetails.split(' ').length <= 100) {
+            return blogDetails;
+        } else {
+            const truncatedText = blogDetails.split(' ').slice(0, 100).join(' ');
+            return (
+                <>
+                    {truncatedText}{' '}
+                    <button onClick={toggleFullText} className="text-blue-500">
+                        Read more
+                    </button>
+                </>
+            );
+        }
+    };
+
     return (
         <div>
             <h1 className='text-2xl text-center'>My Total Blogs: {myBlogs.length}</h1>
-            <div className='grid grid-cols-1 lg:grid-cols-2'>
-            {
-                myBlogs.map(singleBlog => <div key={singleBlog._id} className="card w-96 bg-base-100 shadow-xl">
-                <figure><img src={singleBlog.blogImg} alt="Blog Img" /></figure>
-                <div className="card-body">
-                  <h2 className="card-title">{singleBlog.blogTitle}</h2>
-                  <p>{singleBlog.blogDetails}</p>
-                  <div className="card-actions justify-end">
-                    <button onClick={() => handleUpdate(singleBlog)} className="btn btn-warning">update</button>
-                    <button onClick={() => handledelete(singleBlog)} className="btn btn-error">Delete</button>
-                  </div>
-                </div>
-              </div>)
-            }
+            <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mx-auto gap-2 p-2'>
+                {
+                    myBlogs.map(singleBlog => <div key={singleBlog._id} className="card bg-base-100 shadow-xl">
+                        <figure><img src={singleBlog.blogImg} alt="Blog Img" style={{ height: '280px', width: '100%', objectFit: 'cover' }}/></figure>
+                        <div className="card-body">
+                            <h2 className="card-title">{singleBlog.blogTitle}</h2>
+                            <p>{renderBlogDetails(singleBlog.blogDetails)}</p>
+                            <div className="card-actions justify-end">
+                                <button onClick={() => handleUpdate(singleBlog)} className="btn btn-warning">update</button>
+                                <button onClick={() => handledelete(singleBlog)} className="btn btn-error">Delete</button>
+                            </div>
+                        </div>
+                    </div>)
+                }
             </div>
         </div>
     );
