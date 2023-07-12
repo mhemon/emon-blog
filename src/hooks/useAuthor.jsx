@@ -9,7 +9,7 @@ const useAuthor = () => {
 
     const {data: isAuthor, isLoading: isAuthorLoading} = useQuery({
         queryKey: ['isAuthor', user?.email],
-        enabled: !loading, 
+        enabled: !!user && !loading, 
         queryFn: async () => {
         const res = await axiosSecure(`check-author/${user?.email}`)
         return res.data.author

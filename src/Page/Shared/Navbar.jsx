@@ -26,8 +26,12 @@ const Navbar = () => {
 
     const navItems = <>
         <li><NavLink to='/'>Blogs</NavLink></li>
-        {isAuthor && <li><NavLink to='/myblogs'>My Blogs</NavLink></li>}
-        {isAuthor && <li><NavLink to='/newblog'>Add New Blog</NavLink></li>}
+        {user && (
+            isAuthor && <li><NavLink to='/myblogs'>My Blogs</NavLink></li>
+        )}
+        {user && (
+            isAuthor && <li><NavLink to='/newblog'>Add New Blog</NavLink></li>
+        )}
     </>
     return (
         <div className="navbar bg-base-100">
@@ -48,7 +52,18 @@ const Navbar = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-                {user ? <button onClick={handleLogout} className="btn">Logout</button> : <Link to='/login' className="btn">Login</Link>}
+                {user ? <>
+                    <div className="tooltip tooltip-bottom" data-tip={user?.displayName}>
+                        <div className="avatar hidden md:block">
+                            <div className=" w-12 me-2 rounded-full">
+                                <img src={user?.photoURL} />
+                            </div>
+                        </div>
+                    </div>
+                    <button onClick={handleLogout} className="btn btn-outline btn-error px-2">Logout</button>
+                </> : <>
+                    <Link to='/login'><button className='btn btn-sm btn-primary btn-outline normal-case md:btn md:btn-primary md:normal-case rounded-lg md:btn-outline'>Login</button></Link>
+                </>}
             </div>
         </div>
     );
