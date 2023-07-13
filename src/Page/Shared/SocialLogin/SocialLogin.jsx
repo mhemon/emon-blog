@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { BsGoogle } from "react-icons/bs";
 import Swal from 'sweetalert2';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 
 const SocialLogin = () => {
   const { googleLogin } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
   const photoURL = 'https://i.ibb.co/9T2XqZ3/user-1.png';
 
   const handleGoogle = () => {
@@ -37,7 +35,7 @@ const SocialLogin = () => {
           // Perform Google login with the selected user type
           googleLogin()
             .then((result) => {
-              fetch('http://localhost:5000/users', {
+              fetch('https://emon-blog-server.vercel.app/users', {
                 method: 'POST',
                 headers: {
                   'content-type': 'application/json'
@@ -45,8 +43,16 @@ const SocialLogin = () => {
                 body: JSON.stringify({ name: result.user.displayName, email: result.user.email, image: photoURL, role: userType })
               })
                 .then(res => res.json())
-                .then(() => {
-                  navigate(from, { replace: true });
+                .then((data) => {
+                  console.log(data);
+                  if(data.insertedId || data.message){
+                    navigate('/');
+                    return
+                  }
+                  Swal.fire({
+                    icon: 'error',
+                    title: "Something went wrong!"
+                  })
                 })
             })
             .catch(error => {

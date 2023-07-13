@@ -23,7 +23,7 @@ const Blogs = () => {
     const { data: allBlogs = [], isLoading, refetch } = useQuery({
         queryKey: ['all-blogs'],
         queryFn: async () => {
-            const res = await axios('http://localhost:5000/blogs')
+            const res = await axios('https://emon-blog-server.vercel.app/blogs')
             return res.data
         }
     })

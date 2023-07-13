@@ -1,17 +1,16 @@
 import React from 'react';
 import useAuth from './useAuth';
-import useAxiosSecure from './useAxiosSecure';
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
 const useAuthor = () => {
     const { user, loading } = useAuth()
-    const [axiosSecure] = useAxiosSecure()
 
     const {data: isAuthor, isLoading: isAuthorLoading} = useQuery({
         queryKey: ['isAuthor', user?.email],
-        enabled: !!user && !loading, 
+        enabled: !loading, 
         queryFn: async () => {
-        const res = await axiosSecure(`check-author/${user?.email}`)
+        const res = await axios.get(`https://emon-blog-server.vercel.app/check-author/${user?.email}`)
         return res.data.author
     }})
     return [isAuthor, isAuthorLoading]
