@@ -30,7 +30,7 @@ const NewBlog = () => {
                 const ImgURL = ImgResponse.data.display_url
                 const {title, details} = data
                 const createdAt = new Date().toISOString();
-                const newBlog = {blogTitle: title, blogDetails: details, author: user?.displayName, authorEmail: user?.email, blogImg: ImgURL, comment: "", createdAt: createdAt, likeCount: 0, pageView: 0}
+                const newBlog = {blogTitle: title, blogDetails: details, author: user?.displayName, authorEmail: user?.email, blogImg: ImgURL, comment: [], createdAt: createdAt, likes: [], pageView: 0}
                 console.log(newBlog);
                 axiosSecure.post('/newblog', newBlog)
                 .then(res => {

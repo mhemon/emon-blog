@@ -156,12 +156,13 @@ const Blogs = () => {
                     allBlogs.map(singleBlog => <div key={singleBlog._id} className="card bg-base-100 shadow-xl">
                         <figure><img src={singleBlog.blogImg} alt="Blog Img" style={{ height: '280px', width: '100%', objectFit: 'cover' }} /></figure>
                         <div className="card-body">
+                            <p>Written By:- {singleBlog.author}</p>
                             <h2 className="card-title">{singleBlog.blogTitle}</h2>
                             <p>{renderBlogDetails(singleBlog.blogDetails)}</p>
                             <div className="card-actions justify-between items-center">
                                 <button onClick={() => handleLike(singleBlog)} className="btn">
                                     {singleBlog.likes.includes(user?.email) ? (
-                                        <AiFillHeart size="2em" />
+                                        <AiFillHeart color='red' size="2em" />
                                     ) : (
                                         <AiOutlineHeart size="2em" />
                                     )}
