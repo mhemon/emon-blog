@@ -9,11 +9,13 @@ import useAuth from '../../hooks/useAuth';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
+import formatDate from '../../utils/DateFormat';
 
 const Blogs = () => {
 
     const [showFullText, setShowFullText] = useState(false);
     const { user } = useAuth()
+    // console.log(user);
     const [axiosSecure] = useAxiosSecure()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
@@ -83,8 +85,65 @@ const Blogs = () => {
     }
 
     const handleComment = (singleBlog) => {
+        if (!user) {
+            Swal.fire({
+                title: 'Please Login First?',
+                text: "You can't Comment without Login!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Login Now!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigate('/login');
+                }
+            });
+            return;
+        }
 
-    }
+        // show comment popup
+        // get time and date
+        const commentedAt = new Date().toISOString();
+        Swal.fire({
+            title: 'Write your comment',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Comment',
+            showLoaderOnConfirm: true,
+            preConfirm: (comment) => {
+                const commentData = {
+                    comment: comment,
+                    blogId: singleBlog._id,
+                    userName: user?.displayName,
+                    userPic: user?.photoURL,
+                    commentedAt: commentedAt
+                }
+                return axiosSecure.post('/comment', commentData)
+                    .then(res => {
+                        console.log(res);
+                        return res;
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error}`);
+                    });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                refetch()
+                Swal.fire({
+                    title: 'Comment Posted!',
+                    text: 'Your comment has been posted successfully.',
+                    icon: 'success'
+                });
+            }
+        });
+    };
+
 
     return (
         <div>
@@ -108,8 +167,31 @@ const Blogs = () => {
                                     )}
                                     {singleBlog.likes.length}
                                 </button>
-                                <button onClick={() => handleComment(singleBlog)} className="btn"><FaRegCommentAlt size='2em' /> {singleBlog.likeCount}</button>
+                                <button onClick={() => handleComment(singleBlog)} className="btn"><FaRegCommentAlt size='2em' /> {singleBlog.comment.length}</button>
                                 <p>Total Page View: {singleBlog.pageView}</p>
+                                {/* show comment - only for logged in user*/}
+                                {user && <>
+                                    <h1 className="text-center w-full mt-1 underline font-semibold">Comment</h1>
+                                    <div className="flex flex-col">
+                                        {singleBlog.comment.map((singleComment, index) => (
+                                            <div className="flex items-start border p-4 mb-4" key={index}>
+                                                <div className="mr-4">
+                                                    <div className="w-12 h-12 rounded-full overflow-hidden">
+                                                        <img src={singleComment.userPic} alt="User Avatar" className="w-full h-full object-cover" />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center mb-2">
+                                                        <h4 className="text-sm font-bold mr-2">{singleComment.userName}</h4>
+                                                        <span className="text-gray-500 text-sm">{formatDate(singleComment.time)}</span>
+                                                    </div>
+                                                    <p className="text-gray-800">{singleComment.text}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                </>}
                             </div>
                         </div>
                     </div>)
